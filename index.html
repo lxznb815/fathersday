@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎂 爸爸，生日快乐！</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: radial-gradient(circle at center, #1a1a2e, #000000);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            color: #fff;
+            overflow: hidden;
+            perspective: 1000px;
+        }
+
+        /* 贺卡主体 */
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 40px 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            max-width: 90%;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            transform-style: preserve-3d;
+            animation: floatCard 6s ease-in-out infinite;
+            z-index: 10;
+        }
+
+        @keyframes floatCard {
+            0%, 100% { transform: rotateX(0deg) rotateY(0deg) translateY(0); }
+            50% { transform: rotateX(2deg) rotateY(-2deg) translateY(-10px); }
+        }
+
+        /* 会呼吸的蛋糕 */
+        .cake { 
+            font-size: 80px; 
+            margin-bottom: 20px; 
+            display: inline-block;
+            animation: pulse 2s infinite;
+            filter: drop-shadow(0 0 15px rgba(255, 200, 0, 0.8));
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        /* 标题 */
+        .title {
+            font-size: 28px;
+            font-weight: bold;
+            background: linear-gradient(90deg, #f9d423, #ff4e50);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        /* 打字机文字 */
+        .message {
+            font-size: 18px;
+            line-height: 2;
+            min-height: 150px;
+            color: #e0e0e0;
+        }
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 18px;
+            background: #fff;
+            margin-left: 2px;
+            animation: blink 0.8s infinite;
+            vertical-align: middle;
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* 提示文字 */
+        .hint {
+            margin-top: 30px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.4);
+            animation: fadeIn 2s ease forwards;
+            animation-delay: 8s;
+            opacity: 0;
+        }
+
+        /* 烟花画布 */
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        /* 蛋糕雨容器 */
+        .cake-rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+            overflow: hidden;
+        }
+        .cake-drop {
+            position: absolute;
+            top: -50px;
+            font-size: 30px;
+            animation: fall linear infinite;
+            opacity: 0.8;
+        }
+        @keyframes fall {
+            0% { transform: translateY(-50px) rotate(0deg); opacity: 0.8; }
+            100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+        }
+
+        @keyframes fadeIn { to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div class="cake-rain" id="cakeRain"></div>
+    <canvas id="fireworksCanvas"></canvas>
+
+    <div class="card">
+        <div class="cake">🎂</div>
+        <div class="title">🎉 爸爸，生日快乐！🎉</div>
+        <div class="message" id="typewriter"></div>
+        <div class="hint">👆 点击屏幕任意位置，为您自己放烟花吧！</div>
+    </div>
+
+    <script>
+        // 1. 蛋糕雨效果
+        const cakeRainContainer = document.getElementById('cakeRain');
+        const cakeEmojis = ['🎂', '🍰', '🧁', '🍩', '🍪', '🎈', '🎁','💖'];
+        
+        function createCakeDrop() {
+            const drop = document.createElement('div');
+            drop.className = 'cake-drop';
+            drop.textContent = cakeEmojis[Math.floor(Math.random() * cakeEmojis.length)];
+            drop.style.left = Math.random() * 100 + '%';
+            drop.style.fontSize = (Math.random() * 20 + 20) + 'px';
+            drop.style.animationDuration = (Math.random() * 3 + 4) + 's';
+            drop.style.animationDelay = Math.random() * 2 + 's';
+            cakeRainContainer.appendChild(drop);
+            
+            // 动画结束后移除元素，避免内存泄漏
+            setTimeout(() => drop.remove(), 8000);
+        }
+        
+        // 每300ms生成一个蛋糕
+        setInterval(createCakeDrop, 300);
+        // 初始先生成一批
+        for(let i = 0; i < 15; i++) setTimeout(createCakeDrop, i * 100);
+
+        // 2. 打字机效果
+        const text = "感谢您一直以来的辛勤付出和对我无私的爱。\n愿您在新的一岁里：\n身体健康(少抽烟喝酒)，笑口常开，\n每天都有好心情，烦恼全消！\n\n永远爱您的孩子 雷翔❤️";
+        const typewriterEl = document.getElementById('typewriter');
+        let index = 0;
+
+        function type() {
+            if (index < text.length) {
+                if (text.charAt(index) === '\n') {
+                    typewriterEl.innerHTML += '<br>';
+                } else {
+                    typewriterEl.innerHTML += text.charAt(index);
+                }
+                index++;
+                setTimeout(type, 80);
+            } else {
+                typewriterEl.innerHTML += '<span class="cursor"></span>';
+            }
+        }
+        setTimeout(type, 1000);
+
+        // 3. 烟花效果
+        const canvas = document.getElementById('fireworksCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 5 + 2;
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+                this.alpha = 1;
+                this.friction = 0.95;
+            }
+            update() {
+                this.vx *= this.friction;
+                this.vy *= this.friction;
+                this.x += this.vx;
+                this.y += this.vy;
+                this.alpha -= 0.02;
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function createFirework(x, y) {
+            const colors = ['#ff4e50', '#f9d423', '#00f2fe', '#4facfe', '#ff9a9e'];
+            for (let i = 0; i < 50; i++) {
+                particles.push(new Particle(x, y, colors[Math.floor(Math.random() * colors.length)]));
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles = particles.filter(p => p.alpha > 0);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        document.body.addEventListener('click', (e) => {
+            createFirework(e.clientX, e.clientY);
+        });
+    </script>
+</body>
+</html>
