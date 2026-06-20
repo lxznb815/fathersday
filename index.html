@@ -124,6 +124,71 @@
         }
 
         @keyframes fadeIn { to { opacity: 1; } }
+        /* --- 视频按钮与弹窗样式 (深蓝色版) --- */
+.video-button {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000;
+    
+    /* 外观样式 - 深蓝色背景 */
+    background: linear-gradient(45deg, #1a1a5e, #0d47a1); /* 深蓝渐变 */
+    color: #fff;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(13, 71, 161, 0.4);
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+/* 按钮悬停效果 */
+.video-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(13, 71, 161, 0.6);
+}
+
+/* 2. 模态背景 (遮罩层) */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    z-index: 1001;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* 3. 视频容器 */
+.modal-content {
+    background: #000;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    max-width: 90vw;
+    max-height: 90vh;
+}
+
+/* 视频样式 */
+.modal-content video {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* 淡入动画 */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
     </style>
 </head>
 <body>
@@ -245,6 +310,31 @@
         document.body.addEventListener('click', (e) => {
             createFirework(e.clientX, e.clientY);
         });
+      
+// --- 视频弹窗功能逻辑 ---
+const videoBtn = document.getElementById('videoBtn');
+const videoModal = document.getElementById('videoModal');
+
+// 1. 点击按钮：显示模态框
+videoBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    videoModal.style.display = "flex";
+});
+
+// 2. 点击模态框任意位置：关闭
+videoModal.addEventListener('click', function() {
+    videoModal.style.display = "none"; 
+    // 关闭时暂停视频
+    const video = videoModal.querySelector('video');
+    if (video) video.pause();
+});
+
+// 3. 阻止点击视频内部时关闭
+const videoContent = document.querySelector('.modal-content');
+videoContent.addEventListener('click', function(e) {
+    e.stopPropagation();
+});
+
     </script>
 </body>
 </html>
