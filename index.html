@@ -336,5 +336,17 @@ videoContent.addEventListener('click', function(e) {
 });
 
     </script>
+    <!-- 视频按钮 -->
+    <button id="videoBtn" class="video-button">🎥 点击看祝福视频</button>
+
+    <!-- 视频弹窗 (模态框) -->
+    <div id="videoModal" class="modal">
+        <div class="modal-content">
+            <!-- 请将 '你的视频文件名.mp4' 替换为你实际的视频文件路径 -->
+            <video controls autoplay>
+                <source src="mv_20260620230028.mp4" type="video/mp4">
+            </video>
+        </div>
+    </div>
 </body>
 </html>
