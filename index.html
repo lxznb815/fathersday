@@ -127,7 +127,9 @@
     </style>
 </head>
 <body>
-<!-- 这里的 src 换成你自己的音乐文件路径 -->
+<!-- 添加 muted 属性可以骗过浏览器的自动播放策略，先无声播放，等有点击后再开启声音 -->
+<audio id="bgMusic" loop src="你的音乐文件名.mp3"></audio>
+ <!-- 这里的 src 换成你自己的音乐文件路径 -->
 <audio id="bgMusic" loop>
     <source src="123.mp3" type="audio/mpeg">
     您的浏览器不支持 audio 元素。
@@ -249,6 +251,28 @@
         document.body.addEventListener('click', (e) => {
             createFirework(e.clientX, e.clientY);
         });
+// 获取音频元素
+var bgMusic = document.getElementById('bgMusic');
+
+// 定义一个函数来处理播放
+function tryPlayMusic() {
+    bgMusic.play().then(() => {
+        console.log('音乐开始播放');
+    }).catch((error) => {
+        console.log('自动播放失败，等待用户交互:', error);
+    });
+}
+
+// 方案 A：尝试直接自动播放（可能会被拦截）
+tryPlayMusic();
+
+// 方案 B：监听用户的第一次点击，确保音乐能响起来
+document.addEventListener('click', function() {
+    // 如果音乐没在放，就播放；如果在放，就不管它
+    if (bgMusic.paused) {
+        bgMusic.play();
+    }
+}, { once: true });
     </script>
 </body>
 </html>
